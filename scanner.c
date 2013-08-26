@@ -3,13 +3,13 @@
 //the checkDirs method which searches and "equalizes" directory
 //B with directory A, as input by the user. Whatever is in A but not
 //in B is copied over, while whatever is in B but not A is deleted.
-#include <stdio.h>
+#include <cstdio>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 char*** checkDirs(char* apath);
 
@@ -54,7 +54,7 @@ char*** checkDirs(char* apath){
 	int aItems = 0;
         char* aString;
         if (!(a = opendir(apath))){				//check if both directories can open first.
-                error("Failed to open directory a!");
+                //error("Failed to open directory a!");
 		exit(1);
 	}
 	while(0 != (adent = readdir(a))){ //Read through A's files and store their names and stats.
@@ -70,7 +70,7 @@ char*** checkDirs(char* apath){
 			dirA = realloc(dirA,aItems * sizeof(struct stat));
 			if(stat(tempA,&dirA[aItems-1]) < 0)
                		{
-               		         perror("");
+               		         //perror("");
                		         break;
          	        }
 		}
