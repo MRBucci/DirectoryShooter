@@ -19,7 +19,7 @@ int **wordSort(char** fileNames);
 
 int main(int argc, char *argv[])
 {
-	char dirA[] = "./";
+	char dirA[] = ".\\";
 	char*** files;
 	int** fileVals;
 	strcat(dirA,argv[1]);
@@ -49,7 +49,7 @@ char*** checkDirs(char* apath){
 	char buffer[1024]; //This isn't a very large buffer, but it should
 	char currentFile[128];//get the job done for small files and I wasn't given a size limit.
 	Anames = malloc(sizeof(char*));
-	strcat(apath,"/");
+	strcat(apath,"\\");
 	char tempA[256];
 	int aItems = 0;
         char* aString;
