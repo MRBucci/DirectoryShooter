@@ -3,13 +3,13 @@
 //the checkDirs method which searches and "equalizes" directory
 //B with directory A, as input by the user. Whatever is in A but not
 //in B is copied over, while whatever is in B but not A is deleted.
-#include <cstdio>
+#include <stdio.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <cstdlib>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
 char*** checkDirs(char* apath);
 
@@ -27,12 +27,11 @@ int main(int argc, char *argv[])
 	fileVals = wordSort(files[1]);
 	printf("%s %d \n", files[1][0],*fileVals[0]);
 	int i,j;
-	//for(i = 0; i < sizeof(files); i++){
-	//	for(j = 0; j < sizeof(files[i]); j++){
-	//		free(files[i][j]);
-	//	}
-	//	free(files[i]);
-	//}
+	for(i = 0; i < sizeof(files); i++){
+		for(j = 0; j < sizeof(files[i]); j++){
+			printf("%s\n", files[i][j]);
+		}
+	}
 	for(i = 0; i < sizeof(fileVals); i++)
 		free(fileVals[i]);
 }
