@@ -11,40 +11,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-char*** checkDirs(char* apath);
+int* checkDirs(char* apath, int* arraySize);
 
 int multiHash(char* aWord);
 
-int **wordSort(char** fileNames);
+int wordSort(char* fileNames);
 
 int main(int argc, char *argv[])
 {
 	char dirA[] = ".\\";
-	char*** files;
-	int** fileVals;
 	strcat(dirA,argv[1]);
-	files = checkDirs(dirA);
-	fileVals = wordSort(files[1]);
-	printf("%s %d \n", files[1][0],*fileVals[0]);
-	int i,j;
-	for(i = 0; i < sizeof(files); i++){
-		for(j = 0; j < sizeof(files[i]); j++){
-			printf("%s\n", files[i][j]);
-		}
-	}
-	for(i = 0; i < sizeof(fileVals); i++)
-		free(fileVals[i]);
+	int* arraySize = malloc(sizeof(int));
+	int* fileVals = checkDirs(dirA, arraySize);
+	int i;
+	for (i = 0; i < *arraySize; i++)
+		printf("%d\n",fileVals[i]);
+	free(arraySize);
+	free(fileVals);
 }
 
 //This method is the meat of the program, taking in two paths and searching their directories.
 //This is the first time I can actually feel really thankful for recursion.
-char*** checkDirs(char* apath){
+int* checkDirs(char* apath, int* arraySize){
 	DIR *a;
         struct dirent *adent; 
 	struct stat *dirA;
 	dirA = malloc(sizeof(stat));
 	char **Anames;
-	char ***returnFiles = malloc(2 * sizeof(char**));
 	char buffer[1024]; //This isn't a very large buffer, but it should
 	char currentFile[128];//get the job done for small files and I wasn't given a size limit.
 	Anames = malloc(sizeof(char*));
@@ -53,7 +46,7 @@ char*** checkDirs(char* apath){
 	int aItems = 0;
         char* aString;
         if (!(a = opendir(apath))){				//check if both directories can open first.
-                //error("Failed to open directory a!");
+                error("Failed to open directory a!");
 		exit(1);
 	}
 	while(0 != (adent = readdir(a))){ //Read through A's files and store their names and stats.
@@ -69,36 +62,42 @@ char*** checkDirs(char* apath){
 			dirA = realloc(dirA,aItems * sizeof(struct stat));
 			if(stat(tempA,&dirA[aItems-1]) < 0)
                		{
-               		         //perror("");
+               		         perror("");
                		         break;
          	        }
 		}
         }
 	int i,dirCount,fileCount,nbytes,found,readFile,writeFile;
-	returnFiles[0] = malloc(sizeof(aItems) * sizeof(char*));
-	returnFiles[1] = malloc(sizeof(aItems) * sizeof(char*));
 	dirCount = 0;
+	*arraySize = aItems;
+	int* finalVals = malloc(((int)aItems) * sizeof(int));
 	fileCount = 0;
+	printf("aItems is %d", aItems);
 	//First, we search through A to find things that aren't in B to copy over, including directories.
 	for (i = 0; i < aItems; i++){
-		found = 0;				//found will be used with multiple checks of the directories.
+		finalVals[i] = wordSort(Anames[i]);				//found will be used with multiple checks of the directories.
 		strcpy(tempA,apath);
-		strcat(tempA,Anames[i]);			//Return temps to their original paths, adding the current file to A.
-		if (S_ISDIR(dirA[i].st_mode) != 0){			//First, check if the current file is a directory.
-			returnFiles[0][dirCount] = malloc(sizeof(Anames[i])*sizeof(char));
+		strcat(tempA,Anames[i]);
+		/*if (S_ISDIR(dirA[i].st_mode) != 0){			//First, check if the current file is a directory.
+			returnFiles[0] = realloc(returnFiles[0],(dirCount+1) * sizeof(char*));
+			returnFiles[0][dirCount] = malloc((strlen(Anames[i])+1)*sizeof(char));
 			strcpy(returnFiles[0][dirCount],Anames[i]);
+			printf("%s",returnFiles[0][dirCount]);
 			dirCount = dirCount + 1;	
+			printf("Dircount %d %d \n",dirCount,sizeof(returnFiles[0]));
 			}
 		else{
-			returnFiles[1][fileCount] = malloc(sizeof(Anames[i])*sizeof(char));
+			returnFiles[1] = realloc(returnFiles[1],(fileCount+1) * sizeof(char*));
+			returnFiles[1][fileCount] = malloc((strlen(Anames[i])+1)*sizeof(char));
                         strcpy(returnFiles[1][fileCount],Anames[i]);
                         fileCount = fileCount + 1;
-		}
+			printf("Filecount %d %d \n",fileCount,sizeof(returnFiles[1]));
+		}*/
         }
 	free(dirA);
 	free(Anames);
 	closedir(a);
-	return returnFiles;
+	return finalVals;
 }
 
 
@@ -112,29 +111,18 @@ int multiHash(char* aWord)
 	return value % 26;
 }
 
-int **wordSort(char** fileNames){
+int wordSort(char* fileNames){
 	int i;
 	char* per; 
-	int **wordValues = malloc(sizeof(fileNames) * sizeof(int*));
-	for (i = 0; i < sizeof(fileNames); i++){
-		wordValues[i] = (int*)malloc(sizeof(int));
-                
-			per = strstr(fileNames[i],".");	
-			if (per != NULL){
-			if (strcmp(per, ".bat"))
-					*wordValues[i] = 30;
-			else if(strcmp(per, ".exe"))
-					*wordValues[i] = 40;
-			else if(strcmp(per, ".py"))
-					*wordValues[i] = 50;
-			else if(strcmp(per, ".cpp"))
-					*wordValues[i] = 60;
-			else if(strcmp(per, ".c"))
-					*wordValues[i] = 70;
-			}
-			else
-					*wordValues[i] = multiHash(fileNames[i]);
-					
+	per = strstr(fileNames,".");	
+	printf("per is %s\n", per);
+	if (per != NULL){
+		if ((strcmp(per, ".doc") == 0) || (strcmp(per, ".txt") == 0))
+			return 1;
+		else if((strcmp(per, ".png") == 0) || (strcmp(per, ".jpg") == 0) || (strcmp(per, ".jpeg") == 0))
+			return 2;
+		else if((strcmp(per, ".mp3") == 0) || (strcmp(per, ".wav") == 0))
+			return 3;
 		}
-	return wordValues;
+		return 4;
 }
