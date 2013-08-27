@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1377518194 source:c:\users\home\workspace\codeblocktest\test\main.cpp
+	"SDL.h"
+	"SDL_opengl.h"
+	<iostream>
+
